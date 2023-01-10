@@ -1,0 +1,6 @@
+Flask
+Pillow
+geocoder
+google-cloud-logging
+gunicorn
+ua-parser

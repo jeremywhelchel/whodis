@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>who dis ?</title>
+    <style>
+      a.sbf:link {
+          text-decoration: inherit;
+          color: inherit;
+          cursor: auto;
+      }
+      a.sbf:visited {
+          text-decoration: inherit;
+          color: inherit;
+          cursor: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <p>
+      <h1 class="title">who dis is?</h1>
+      <pre>{{ data }}</pre>
+      <h1><a class='sbf' href="https://twitter.com/SBF_FTX/status/1591989554881658880">1) What</a></h1>
+      <p>simple demo illustrating information leakage during web requests</p>
+      <p>also available:</p>
+      <ul>
+        <li><a href=/data.png>https://whodis.fyi/data.png</a></li>
+        <li><a href=/data.jpeg>https://whodis.fyi/data.jpeg</a></li>
+        <li><a href=/data.json>https://whodis.fyi/data.json</a></li>
+      </ul>
+      <p>(<a href="https://github.com/jeremywhelchel/whodis">src</a>)</p>
+      <h1>stats</h1>
+      <p>top requesters since server was last restart:</p>
+      <table>
+        <tr>
+          {% for name in top_lists.keys() %}
+          <th>{{name}}</th>
+          {%endfor%}
+        </tr>
+        <tr>
+          {% for top_list in top_lists.values() %}
+          <td>
+            <ul>
+            {% for name, count in top_list %}
+              <li>{{count}} - {{name}}</li>
+            {%endfor%}
+            </ul>
+          </td>
+          {%endfor%}
+        </tr>
+      </table>
+  </body>
+</html>
