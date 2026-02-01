@@ -7,8 +7,15 @@ Dynamically generates an image containing request info:
 Run locally via:
 
 ```bash
-docker docker build -t whodis .
-docker run -e PORT=80 -p 12345:80 whodis
+uv sync
+uv run python main.py
+# Visit http://localhost:8080/
+```
 
+Or with Docker:
+
+```bash
+docker build -t whodis .
+docker run -e PORT=80 -p 12345:80 whodis
 # Visit http://localhost:12345/
 ```

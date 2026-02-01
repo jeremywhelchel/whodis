@@ -1,0 +1,16 @@
+[project]
+name = "whodis"
+version = "0.1.0"
+description = "Web app demonstrating information leakage during web requests"
+requires-python = ">=3.10"
+dependencies = [
+    "flask",
+    "pillow",
+    "geocoder",
+    "google-cloud-logging",
+    "gunicorn",
+    "ua-parser",
+]
+
+[project.scripts]
+whodis = "main:start_app"
