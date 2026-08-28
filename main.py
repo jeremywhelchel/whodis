@@ -30,6 +30,7 @@ app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
 WIDTH = 800
 HEIGHT = 640
 ROBOTO = ImageFont.truetype("RobotoMono-Medium.ttf", 32)
+ROBOTO_SMALL = ImageFont.truetype("RobotoMono-Medium.ttf", 20)
 # Maximum number of characters to fit in WIDTH
 WIDTH_CHARS = int(800 / ROBOTO.getlength(" "))  # - 2
 
@@ -56,7 +57,7 @@ INTERESTING_HEADERS = [
 def index():
     return render_template(
         "index.html",
-        data=get_request_text(),
+        data=get_full_text(),
         top_lists=get_top_stats(),
     )
 
@@ -162,7 +163,17 @@ def request_data() -> dict:
     return strip_dict(d)
 
 
-def get_request_text() -> str:
+def request_summary() -> dict:
+    d = request_data()
+    return {k: d[k] for k in ("ip", "location", "device", "os", "browser") if k in d}
+
+
+def get_summary_text() -> str:
+    pp = pprint.PrettyPrinter(width=WIDTH_CHARS, sort_dicts=False)
+    return pp.pformat(request_summary())
+
+
+def get_full_text() -> str:
     pp = pprint.PrettyPrinter(width=WIDTH_CHARS, sort_dicts=False)
     return pp.pformat(request_data())
 
@@ -172,12 +183,22 @@ def as_json():
     return jsonify(request_data())
 
 
-def make_image(fmt: str) -> io.BytesIO:
-    msg = get_request_text()
+def make_image(fmt: str, full: bool = False) -> io.BytesIO:
+    if full:
+        msg = get_full_text()
+        # Dynamic canvas sized to fit every line at the smaller font.
+        font = ROBOTO_SMALL
+        line_height = font.size + 6
+        lines = msg.splitlines() or [""]
+        height = 16 + len(lines) * line_height
+    else:
+        msg = get_summary_text()
+        font = ROBOTO
+        height = HEIGHT
 
-    image = Image.new("RGB", (WIDTH, HEIGHT), color="blue")
+    image = Image.new("RGB", (WIDTH, height), color="blue")
     draw = ImageDraw.Draw(image)
-    draw.text((10, 10), msg, font=ROBOTO, fill=(255, 255, 0))
+    draw.text((10, 10), msg, font=font, fill=(255, 255, 0))
 
     image_data = io.BytesIO()
     image.save(image_data, format=fmt)
@@ -193,6 +214,16 @@ def as_png():
 @app.route("/data.jpeg")
 def as_jpeg():
     return send_file(make_image("JPEG"), mimetype="image/jpeg")
+
+
+@app.route("/data.full.png")
+def as_full_png():
+    return send_file(make_image("PNG", full=True), mimetype="image/png")
+
+
+@app.route("/data.full.jpeg")
+def as_full_jpeg():
+    return send_file(make_image("JPEG", full=True), mimetype="image/jpeg")
 
 
 def start_app():
