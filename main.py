@@ -104,7 +104,12 @@ def lookup_location(ip: str) -> dict:
 
 
 def request_data() -> dict:
-    ip = request.environ.get("HTTP_X_FORWARDED_FOR", request.remote_addr)
+    # X-Forwarded-For is a comma-separated chain. Earlier entries are
+    # client-controlled; the rightmost is appended by the nearest trusted
+    # proxy, so it is the only entry worth trusting.
+    ip = request.environ.get(
+        "HTTP_X_FORWARDED_FOR", request.remote_addr
+    ).split(",")[-1].strip()
     location = lookup_location(ip)
 
     ua = user_agent_parser.Parse(request.headers["User-Agent"])
