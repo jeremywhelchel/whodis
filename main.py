@@ -112,7 +112,7 @@ def request_data() -> dict:
     ).split(",")[-1].strip()
     location = lookup_location(ip)
 
-    ua = user_agent_parser.Parse(request.headers["User-Agent"])
+    ua = user_agent_parser.Parse(request.headers.get("User-Agent", ""))
 
     d = {
         "ip": ip,
