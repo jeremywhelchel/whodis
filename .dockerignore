@@ -1,0 +1,10 @@
+.git
+.venv
+.env
+.envrc
+.pytype
+.gcloudignore
+Dockerfile
+.dockerignore
+__pycache__
+*.pyc
