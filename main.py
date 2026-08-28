@@ -33,6 +33,24 @@ ROBOTO = ImageFont.truetype("RobotoMono-Medium.ttf", 32)
 # Maximum number of characters to fit in WIDTH
 WIDTH_CHARS = int(800 / ROBOTO.getlength(" "))  # - 2
 
+# Raw request headers that reveal something the parsed UA doesn't,
+# or that users are surprised to learn they send.
+INTERESTING_HEADERS = [
+    "Accept-Language",
+    "Referer",
+    "Sec-CH-UA",
+    "Sec-CH-UA-Mobile",
+    "Sec-CH-UA-Platform",
+    "Sec-CH-UA-Full-Version-List",
+    "Sec-Fetch-Dest",
+    "Sec-Fetch-Mode",
+    "Sec-Fetch-Site",
+    "Sec-Fetch-User",
+    "Upgrade-Insecure-Requests",
+    "DNT",
+    "Priority",
+]
+
 
 @app.route("/")
 def index():
@@ -135,6 +153,11 @@ def request_data() -> dict:
         "os": ua["os"],
         "browser": ua["user_agent"],
     }
+    d["headers"] = {
+        name: value
+        for name in INTERESTING_HEADERS
+        if (value := request.headers.get(name)) is not None
+    }
     update_stats(d)
     return strip_dict(d)
 
@@ -164,18 +187,12 @@ def make_image(fmt: str) -> io.BytesIO:
 
 @app.route("/data.png")
 def as_png():
-    return send_file(
-        make_image("PNG"),
-        mimetype="image/png",
-    )
+    return send_file(make_image("PNG"), mimetype="image/png")
 
 
 @app.route("/data.jpeg")
 def as_jpeg():
-    return send_file(
-        make_image("JPEG"),
-        mimetype="image/jpeg",
-    )
+    return send_file(make_image("JPEG"), mimetype="image/jpeg")
 
 
 def start_app():
