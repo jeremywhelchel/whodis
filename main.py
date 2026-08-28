@@ -92,14 +92,28 @@ def get_top_stats() -> dict:
     return top_lists
 
 
-@lru_cache(maxsize=100000)
+# Only successful lookups are cached; failures (bad IPs, rate-limit
+# responses) are retried on the next request so a permanent negative
+# result never occupies a cache slot or masks a transient error.
+# Cap the cache to keep memory bounded; clearing it entirely is fine
+# since it is purely an optimization.
+_location_cache: dict = {}
+
+
 def lookup_location(ip: str) -> dict:
-    location = {}
+    if ip in _location_cache:
+        return _location_cache[ip]
+
     # This call is limited to 50k requests/month, or about 1.6k/day
     # https://ipinfo.io/developers#rate-limits
     g = geocoder.ip(ip)
-    if g.ok:
-        location = {"city": g.city, "country": g.country}
+    if not g.ok:
+        return {}
+
+    location = {"city": g.city, "country": g.country}
+    if len(_location_cache) >= 100_000:
+        _location_cache.clear()
+    _location_cache[ip] = location
     return location
 
 
