@@ -88,6 +88,25 @@ class TestHeaderDump:
         assert "Accept-Language" not in rv.get_json().get("headers", {})
 
 
+class TestTag:
+    def test_tag_is_extracted_as_a_field(self):
+        rv = client().get("/data.json?tag=forum-post-42")
+        assert rv.get_json()["tag"] == "forum-post-42"
+
+    def test_no_tag_means_no_tag_key(self):
+        rv = client().get("/data.json")
+        assert "tag" not in rv.get_json()
+
+    def test_tag_appears_in_social_summary(self):
+        rv = client().get("/data.png?tag=embed-test")
+        assert rv.status_code == 200
+        # The summary that feeds the social image includes the tag when
+        # present, so a tagged embed is visually distinguishable.
+        rv_json = client().get("/data.json?tag=embed-test")
+        assert rv_json.get_json()["tag"] == "embed-test"
+
+
+
 class TestGeolocationCache:
     def test_successful_lookup_is_cached(self, monkeypatch):
         calls = []

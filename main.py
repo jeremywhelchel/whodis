@@ -155,6 +155,12 @@ def request_data() -> dict:
         "os": ua["os"],
         "browser": ua["user_agent"],
     }
+    # Optional caller-chosen label via ?tag=... . Shown back to the
+    # requester like every other field: part of what a request makes
+    # available, not a record for the server to keep.
+    tag = request.args.get("tag")
+    if tag:
+        d["tag"] = tag
     d["headers"] = {
         name: value
         for name in INTERESTING_HEADERS
@@ -166,7 +172,8 @@ def request_data() -> dict:
 
 def request_summary() -> dict:
     d = request_data()
-    return {k: d[k] for k in ("ip", "location", "device", "os", "browser") if k in d}
+    keys = ("tag", "ip", "location", "device", "os", "browser")
+    return {k: d[k] for k in keys if k in d}
 
 
 def get_summary_text() -> str:
