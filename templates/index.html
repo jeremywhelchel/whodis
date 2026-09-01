@@ -2,22 +2,44 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>who dis ?</title>
     <style>
-      a.sbf:link {
-          text-decoration: inherit;
-          color: inherit;
-          cursor: auto;
+      body {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #222;
+        background: #fff;
+        margin: 0;
       }
-      a.sbf:visited {
-          text-decoration: inherit;
-          color: inherit;
-          cursor: auto;
+      main {
+        max-width: 52rem;
+        margin: 0 auto;
+        padding: 2rem 1.25rem 4rem;
       }
+      h1 { font-size: 1.6rem; margin: 0 0 1rem; }
+      h2 { font-size: 1.1rem; margin: 2rem 0 .5rem; }
+      pre {
+        background: #f4f4f4;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 1rem;
+        overflow-x: auto;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      a { color: #0366d6; }
+      a.sbf:link, a.sbf:visited { text-decoration: inherit; color: inherit; cursor: auto; }
+      table { border-collapse: collapse; font-size: .9rem; }
+      th, td { border: 1px solid #ccc; padding: .3rem .6rem; text-align: left; vertical-align: top; }
+      th { background: #f4f4f4; }
+      ul { padding-left: 1.25rem; }
+      li { margin: .2rem 0; }
     </style>
   </head>
   <body>
-    <p>
+    <main>
       <h1 class="title">who dis is?</h1>
       <pre>{{ data }}</pre>
       <h1><a class='sbf' href="https://twitter.com/SBF_FTX/status/1591989554881658880">1) What</a></h1>
@@ -27,8 +49,8 @@
         <li><a href=/data.json>https://whodis.fyi/data.json</a></li>
         <li><a href=/data.png>https://whodis.fyi/data.png</a></li>
         <li><a href=/data.jpeg>https://whodis.fyi/data.jpeg</a></li>
-        <li><a href=/data.full.png>https://whodis.fyi/data.full.png</a> (all headers)</li>
-        <li><a href=/data.full.jpeg>https://whodis.fyi/data.full.jpeg</a> (all headers)</li>
+        <li><a href=/data.full.png>https://whodis.fyi/data.full.png</a></li>
+        <li><a href=/data.full.jpeg>https://whodis.fyi/data.full.jpeg</a></li>
       </ul>
       <p>(<a href="https://github.com/jeremywhelchel/whodis">src</a>)</p>
       <h1>stats</h1>
@@ -51,5 +73,6 @@
           {%endfor%}
         </tr>
       </table>
+    </main>
   </body>
 </html>
