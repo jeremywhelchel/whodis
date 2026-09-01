@@ -14,3 +14,10 @@ dependencies = [
 
 [project.scripts]
 whodis = "main:start_app"
+
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
