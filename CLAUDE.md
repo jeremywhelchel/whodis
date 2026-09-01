@@ -33,16 +33,19 @@ docker run -e PORT=80 -p 12345:80 whodis
 
 Single-file Flask app (`main.py`) with these endpoints:
 - `/` - HTML page with request info and stats
-- `/data.json` - JSON response
-- `/data.png` - Dynamically generated PNG image
-- `/data.jpeg` - Dynamically generated JPEG image
+- `/data.json` - JSON response (includes `?tag=...` when present)
+- `/data.png` - Social PNG image (fixed size, summary only)
+- `/data.jpeg` - Social JPEG image (fixed size, summary only)
+- `/data.full.png` - Full PNG image (all headers, auto-sized canvas)
+- `/data.full.jpeg` - Full JPEG image (all headers, auto-sized canvas)
 
 Key dependencies:
-- `geocoder` - IP geolocation via ipinfo.io (rate limited to 50k requests/month, results cached with `lru_cache`)
+- `geocoder` - IP geolocation via ipinfo.io (rate limited to 50k requests/month, successful results cached)
 - `ua-parser` - User-Agent string parsing
 - `Pillow` - Dynamic image generation with RobotoMono-Medium.ttf font
-- `google-cloud-logging` - Cloud logging when running in Cloud Run (detected via `K_SERVICE` env var)
 
 In-memory stats (`STATS` dict) track device/OS/browser/country counts, displayed on index page. Stats reset on server restart.
+
+Logging is JSON lines on stdout (parsed as structured logs by Cloud Run). The service computes request data per request and retains no per-request storage.
 
 Production uses gunicorn via the Dockerfile CMD.
