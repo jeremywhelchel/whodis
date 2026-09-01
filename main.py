@@ -2,6 +2,7 @@
 
 import collections
 import datetime
+import re
 from flask import (
     Flask,
     jsonify,
@@ -14,12 +15,12 @@ from flask import (
 )
 from functools import lru_cache
 import geocoder
-import google.cloud.logging
 import io
 import json
 import logging
 import os
 import pprint
+import sys
 from PIL import Image, ImageDraw, ImageFont
 from ua_parser import user_agent_parser
 
@@ -226,19 +227,33 @@ def as_full_jpeg():
     return send_file(make_image("JPEG", full=True), mimetype="image/jpeg")
 
 
-def start_app():
-    # If running in Google Cloud Run, use cloud logging
-    if "K_SERVICE" in os.environ:
-        # Setup Google Cloud logging
-        # By default this captures all logs at INFO level and higher
-        log_client = google.cloud.logging.Client()
-        log_client.get_default_handler()
-        log_client.setup_logging()
-        logging.info("Using google cloud logging")
-    else:
-        logging.getLogger().setLevel(logging.INFO)
-        logging.info("Using standard logging")
+_ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 
+
+class JsonFormatter(logging.Formatter):
+    """Emit each log record as a JSON line on stdout.
+
+    Cloud Run parses stdout JSON blobs as structured logs and maps the
+    standard "severity" field onto Cloud Logging severities. ANSI color
+    codes are stripped so aggregators never see escape sequences.
+    """
+
+    def format(self, record: logging.LogRecord) -> str:
+        entry = {
+            "severity": record.levelname,
+            "message": _ANSI_RE.sub("", record.getMessage()),
+        }
+        if record.exc_info:
+            entry["exception"] = self.formatException(record.exc_info)
+        return json.dumps(entry, ensure_ascii=False)
+
+
+def start_app():
+    root = logging.getLogger()
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(JsonFormatter())
+    root.handlers = [handler]
+    root.setLevel(logging.INFO)
     logging.info("Starting app")
     return app
 

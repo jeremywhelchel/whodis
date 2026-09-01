@@ -7,7 +7,6 @@ dependencies = [
     "flask",
     "pillow",
     "geocoder",
-    "google-cloud-logging",
     "gunicorn",
     "ua-parser",
 ]
